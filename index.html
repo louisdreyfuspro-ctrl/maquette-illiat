@@ -1,452 +1,267 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Programme Concours 2026 — Part 1</title>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<title>Domaine équestre — Illiat · Maquette 3D v13</title>
 <style>
-  :root {
-    --navy: #0e1b35;
-    --navy-light: #162240;
-    --gold: #c9a84c;
-    --gold-light: #e2c47a;
-    --white: #ffffff;
-    --gray: #a0aec0;
-    --romain: #3b82f6;
-    --carla: #f97316;
-    --both: #a855f7;
-  }
-
-  * { margin: 0; padding: 0; box-sizing: border-box; }
-
-  body {
-    background: var(--navy);
-    font-family: 'Montserrat', sans-serif;
-    color: var(--white);
-    min-height: 100vh;
-    padding: 0;
-  }
-
-  /* ── HEADER ─────────────────────────────────── */
-  .header {
-    text-align: center;
-    padding: 50px 40px 30px;
-    border-bottom: 1px solid rgba(201,168,76,0.3);
-    position: relative;
-    overflow: hidden;
-  }
-  .header::before {
-    content: '';
-    position: absolute;
-    top: -80px; left: 50%;
-    transform: translateX(-50%);
-    width: 600px; height: 300px;
-    background: radial-gradient(ellipse, rgba(201,168,76,0.12) 0%, transparent 70%);
-    pointer-events: none;
-  }
-
-  .header-sub {
-    font-size: 11px;
-    letter-spacing: 4px;
-    color: var(--gold);
-    text-transform: uppercase;
-    margin-bottom: 12px;
-    font-weight: 600;
-  }
-
-  .header-title {
-    font-family: 'Playfair Display', serif;
-    font-size: clamp(32px, 6vw, 60px);
-    font-weight: 900;
-    color: var(--white);
-    line-height: 1.1;
-    letter-spacing: -1px;
-    margin-bottom: 8px;
-  }
-
-  .header-title span { color: var(--gold); }
-
-  .header-dates {
-    font-size: 13px;
-    color: var(--gray);
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    font-weight: 500;
-    margin-top: 16px;
-  }
-
-  /* ── LÉGENDE ─────────────────────────────────── */
-  .legend {
-    display: flex;
-    justify-content: center;
-    gap: 32px;
-    padding: 20px 40px;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
-    flex-wrap: wrap;
-  }
-  .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    font-size: 11px;
-    font-weight: 600;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-  }
-  .legend-dot {
-    width: 10px; height: 10px;
-    border-radius: 50%;
-    flex-shrink: 0;
-  }
-  .dot-romain { background: var(--romain); }
-  .dot-carla  { background: var(--carla); }
-  .dot-both   { background: var(--both); }
-
-  /* ── GRID CONCOURS ───────────────────────────── */
-  .grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 1px;
-    background: rgba(255,255,255,0.06);
-    margin: 0;
-  }
-
-  /* ── CARD ────────────────────────────────────── */
-  .card {
-    background: var(--navy-light);
-    padding: 0;
-    display: flex;
-    flex-direction: column;
-    transition: background 0.2s;
-  }
-  .card:hover { background: #1c2d52; }
-
-  .card-header {
-    padding: 20px 24px 16px;
-    border-bottom: 2px solid;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 12px;
-  }
-  .card.romain .card-header { border-color: var(--romain); }
-  .card.carla  .card-header { border-color: var(--carla); }
-  .card.both   .card-header { border-color: var(--both); }
-
-  .card-dates {
-    font-family: 'Playfair Display', serif;
-    font-size: 20px;
-    font-weight: 700;
-    color: var(--white);
-    line-height: 1.2;
-  }
-
-  .card-lieu {
-    font-size: 11px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 600;
-    margin-top: 4px;
-  }
-
-  .card-badge {
-    font-size: 10px;
-    font-weight: 700;
-    letter-spacing: 1px;
-    padding: 4px 10px;
-    border-radius: 20px;
-    white-space: nowrap;
-    flex-shrink: 0;
-    text-transform: uppercase;
-  }
-  .card.romain .card-badge { background: rgba(59,130,246,0.2); color: #93c5fd; }
-  .card.carla  .card-badge { background: rgba(249,115,22,0.2);  color: #fdba74; }
-  .card.both   .card-badge { background: rgba(168,85,247,0.2);  color: #d8b4fe; }
-
-  .card-body {
-    padding: 16px 24px 20px;
-    flex: 1;
-  }
-
-  .card-label {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gray);
-    font-weight: 600;
-    margin-bottom: 10px;
-  }
-
-  .horses-list {
-    list-style: none;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-  }
-  .horses-list li {
-    font-size: 13px;
-    font-weight: 500;
-    color: var(--white);
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 6px 10px;
-    background: rgba(255,255,255,0.04);
-    border-radius: 6px;
-    border-left: 2px solid rgba(201,168,76,0.4);
-  }
-  .horse-icon {
-    font-size: 14px;
-    flex-shrink: 0;
-  }
-
-  .card-footer {
-    padding: 12px 24px;
-    border-top: 1px solid rgba(255,255,255,0.06);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-  }
-  .footer-label {
-    font-size: 10px;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    color: var(--gray);
-    font-weight: 600;
-  }
-  .footer-jours {
-    font-family: 'Playfair Display', serif;
-    font-size: 22px;
-    font-weight: 700;
-    color: var(--gold);
-  }
-  .footer-jours span {
-    font-family: 'Montserrat', sans-serif;
-    font-size: 10px;
-    color: var(--gray);
-    font-weight: 500;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    margin-left: 4px;
-  }
-
-  /* ── SECTION MONTH ───────────────────────────── */
-  .month-section { margin-bottom: 0; }
-
-  .month-label {
-    padding: 14px 24px;
-    background: rgba(201,168,76,0.08);
-    border-left: 3px solid var(--gold);
-    font-size: 11px;
-    letter-spacing: 4px;
-    text-transform: uppercase;
-    color: var(--gold);
-    font-weight: 700;
-  }
-
-  /* ── FOOTER ──────────────────────────────────── */
-  .page-footer {
-    text-align: center;
-    padding: 32px 40px;
-    border-top: 1px solid rgba(201,168,76,0.2);
-    font-size: 10px;
-    letter-spacing: 3px;
-    text-transform: uppercase;
-    color: rgba(160,174,192,0.6);
-  }
-
-  @media (max-width: 600px) {
-    .header { padding: 36px 20px 24px; }
-    .legend { gap: 16px; padding: 16px 20px; }
-    .grid { grid-template-columns: 1fr; }
-  }
+  html,body{margin:0;height:100%;overflow:hidden;background:#cdd8e6;font-family:'Barlow Condensed','Avenir Next Condensed','Arial Narrow',system-ui,sans-serif;}
+  #app{position:fixed;inset:0;} canvas{display:block;}
+  .ui{position:fixed;pointer-events:none;color:#26241f;}
+  #title{left:22px;top:18px;}
+  #title h1{font-family:'Spectral',Georgia,'Times New Roman',serif;font-weight:500;font-size:26px;margin:0;color:#2b2a26;}
+  #title p{margin:2px 0 0;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:#5c5a52;}
+  #legend{right:20px;top:18px;background:rgba(251,249,244,.86);backdrop-filter:blur(6px);
+    border:1px solid #c9c2b0;border-radius:10px;padding:14px 16px;pointer-events:auto;min-width:200px;
+    box-shadow:0 6px 24px rgba(0,0,0,.12);}
+  #legend h2{margin:0 0 8px;font-size:12px;letter-spacing:3px;text-transform:uppercase;color:#8a7a5f;font-weight:600;}
+  .row{display:flex;align-items:center;gap:9px;font-size:14px;margin:5px 0;color:#3a3831;}
+  .sw{width:16px;height:12px;border-radius:3px;border:1px solid rgba(0,0,0,.15);}
+  #hint{left:0;right:0;bottom:16px;text-align:center;font-size:13px;letter-spacing:1px;color:#4a4840;}
+  #hint span{background:rgba(251,249,244,.8);padding:5px 14px;border-radius:20px;border:1px solid #c9c2b0;}
+  .btn{pointer-events:auto;cursor:pointer;border:none;border-radius:8px;padding:8px 14px;
+    font-family:inherit;font-size:13px;letter-spacing:1px;text-transform:uppercase;}
+  #controls{left:22px;bottom:16px;display:flex;gap:8px;}
+  .btn.ghost{background:rgba(251,249,244,.9);color:#3a3831;border:1px solid #c9c2b0;}
 </style>
 </head>
 <body>
-
-<!-- HEADER -->
-<div class="header">
-  <div class="header-sub">Saison Hippique</div>
-  <div class="header-title">Programme<br><span>Concours 2026</span></div>
-  <div class="header-sub" style="margin-top:4px;">Part 1</div>
-  <div class="header-dates">Mars · Avril · Mai 2026</div>
+<div id="app"></div>
+<div class="ui" id="title"><h1>Domaine équestre</h1><p>ILLIAT (01) · V13 · partage mobile</p></div>
+<div class="ui" id="legend">
+  <h2>Installations</h2>
+  <div class="row"><span class="sw" style="background:#c9bfa9"></span>Manège couvert 25×66 (211)</div>
+  <div class="row"><span class="sw" style="background:#b3946a"></span>Barn en U — écuries</div>
+  <div class="row"><span class="sw" style="background:#e3d2ab"></span>Carrière 76×40 (216)</div>
+  <div class="row"><span class="sw" style="background:#bcc98f"></span>Paddocks 5 face à 5 (210)</div>
+  <div class="row"><span class="sw" style="background:#fbfaf3"></span>Chemin blanc (portail → écurie)</div>
+  <div class="row"><span class="sw" style="background:#5f7042"></span>Haie périphérique</div>
 </div>
-
-<!-- LÉGENDE -->
-<div class="legend">
-  <div class="legend-item"><div class="legend-dot dot-romain"></div> Romain</div>
-  <div class="legend-item"><div class="legend-dot dot-carla"></div> Carla</div>
-  <div class="legend-item"><div class="legend-dot dot-both"></div> Romain & Carla</div>
+<div class="ui" id="controls">
+  <button class="btn ghost" id="reset">Vue d'ensemble</button>
+  <button class="btn ghost" id="top">Vue plan</button>
+  <button class="btn ghost" id="carr">Vue carrière</button>
 </div>
+<div class="ui" id="hint"><span>1 doigt : pivoter · pincer : zoomer · 2 doigts : déplacer</span></div>
 
-<!-- MARS -->
-<div class="month-section">
-  <div class="month-label">Mars 2026</div>
-  <div class="grid">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+const CX=120, CY=100;
+const M2=(x,y)=>[x-CX,-(y-CY)];
 
-    <div class="card both">
-      <div class="card-header">
-        <div>
-          <div class="card-dates">12 – 15 Mars</div>
-          <div class="card-lieu">Gassin</div>
-        </div>
-        <div class="card-badge">Romain & Carla</div>
-      </div>
-      <div class="card-body">
-        <div class="card-label">Chevaux engagés</div>
-        <ul class="horses-list">
-          <li><span class="horse-icon">🐴</span>Channah Z</li>
-          <li><span class="horse-icon">🐴</span>Comme Convenu</li>
-          <li><span class="horse-icon">🐴</span>Flamme</li>
-          <li><span class="horse-icon">🐴</span>Jasmine</li>
-          <li><span class="horse-icon">🐴</span>How Are You</li>
-          <li><span class="horse-icon">🐴</span>Goldikova</li>
-          <li><span class="horse-icon">🐴</span>Diaron's</li>
-        </ul>
-      </div>
-      <div class="card-footer">
-        <div class="footer-label">Durée</div>
-        <div class="footer-jours">4<span>jours</span></div>
-      </div>
-    </div>
+const scene=new THREE.Scene();
+scene.background=new THREE.Color('#c6d4e4');
+scene.fog=new THREE.Fog('#c6d4e4',240,620);
+const renderer=new THREE.WebGLRenderer({antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
+renderer.outputEncoding=THREE.sRGBEncoding;
+document.getElementById('app').appendChild(renderer.domElement);
+const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,1,2000);
 
-    <div class="card romain">
-      <div class="card-header">
-        <div>
-          <div class="card-dates">26 – 29 Mars</div>
-          <div class="card-lieu">Cluny</div>
-        </div>
-        <div class="card-badge">Romain</div>
-      </div>
-      <div class="card-body">
-        <div class="card-label">Chevaux engagés</div>
-        <ul class="horses-list">
-          <li><span class="horse-icon">🐴</span>Flamme</li>
-          <li><span class="horse-icon">🐴</span>Hiva</li>
-          <li><span class="horse-icon">🐴</span>Diaron's</li>
-          <li><span class="horse-icon">🐴</span>Jasmine</li>
-        </ul>
-      </div>
-      <div class="card-footer">
-        <div class="footer-label">Durée</div>
-        <div class="footer-jours">4<span>jours</span></div>
-      </div>
-    </div>
+scene.add(new THREE.HemisphereLight('#eaf1ff','#8a8462',0.85));
+const sun=new THREE.DirectionalLight('#fff4e0',1.05);
+sun.position.set(120,180,90);sun.castShadow=true;
+sun.shadow.mapSize.set(2048,2048);
+const d=180,sc=sun.shadow.camera;sc.left=-d;sc.right=d;sc.top=d;sc.bottom=-d;sc.near=10;sc.far=520;
+sun.shadow.bias=-0.0004;scene.add(sun);
+scene.add(new THREE.AmbientLight('#ffffff',0.18));
 
-  </div>
-</div>
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(1400,1400),
+  new THREE.MeshStandardMaterial({color:'#98a86a',roughness:1}));
+ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
 
-<!-- AVRIL -->
-<div class="month-section">
-  <div class="month-label">Avril 2026</div>
-  <div class="grid">
+const BOUND=[[10,195],[120,190],[230,172],[240,120],[224,58],[203,18],[120,10],[35,9],[6,72],[13,140],[10,195]];
+(()=>{const pts=BOUND.map(p=>{const[a,b]=M2(p[0],p[1]);return new THREE.Vector3(a,0.15,b);});
+scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
+  new THREE.LineBasicMaterial({color:'#5b5a50'})));})();
 
-    <div class="card carla">
-      <div class="card-header">
-        <div>
-          <div class="card-dates">02 – 12 Avril</div>
-          <div class="card-lieu">Gassin</div>
-        </div>
-        <div class="card-badge">Carla</div>
-      </div>
-      <div class="card-body">
-        <div class="card-label">Chevaux engagés</div>
-        <ul class="horses-list">
-          <li><span class="horse-icon">🐴</span>How Are You</li>
-          <li><span class="horse-icon">🐴</span>Goldikova</li>
-        </ul>
-      </div>
-      <div class="card-footer">
-        <div class="footer-label">Durée</div>
-        <div class="footer-jours">10<span>jours</span></div>
-      </div>
-    </div>
+function plane(x0,y0,x1,y1,color,y=0.06,rough=1){
+  const m=new THREE.Mesh(new THREE.PlaneGeometry(Math.abs(x1-x0),Math.abs(y1-y0)),
+    new THREE.MeshStandardMaterial({color,roughness:rough}));
+  m.rotation.x=-Math.PI/2;const[cx,cz]=M2((x0+x1)/2,(y0+y1)/2);
+  m.position.set(cx,y,cz);m.receiveShadow=true;scene.add(m);return m;
+}
+function building(w,l,wallH,rh,wallColor,roofColor){
+  const g=new THREE.Group();
+  const walls=new THREE.Mesh(new THREE.BoxGeometry(w,wallH,l),
+    new THREE.MeshStandardMaterial({color:wallColor,roughness:.85}));
+  walls.position.y=wallH/2;walls.castShadow=true;walls.receiveShadow=true;g.add(walls);
+  const sh=new THREE.Shape();sh.moveTo(-w/2,0);sh.lineTo(w/2,0);sh.lineTo(0,rh);
+  const rg=new THREE.ExtrudeGeometry(sh,{depth:l,bevelEnabled:false});rg.translate(0,0,-l/2);
+  const roof=new THREE.Mesh(rg,new THREE.MeshStandardMaterial({color:roofColor,roughness:.8}));
+  roof.position.y=wallH;roof.castShadow=true;g.add(roof);return g;
+}
+function place(g,mx,my,rotY=0){const[x,z]=M2(mx,my);g.position.set(x,0,z);g.rotation.y=rotY;scene.add(g);}
+function box(w,h,l,color,mx,my,y){
+  const m=new THREE.Mesh(new THREE.BoxGeometry(w,h,l),
+    new THREE.MeshStandardMaterial({color,roughness:.9}));
+  const[x,z]=M2(mx,my);m.position.set(x,y,z);m.castShadow=true;m.receiveShadow=true;scene.add(m);return m;
+}
+const railMat=new THREE.MeshStandardMaterial({color:'#8a7c63',roughness:.9});
+function rail(a,b){
+  const[x1,z1]=M2(a[0],a[1]),[x2,z2]=M2(b[0],b[1]);
+  const dx=x2-x1,dz=z2-z1,len=Math.hypot(dx,dz),ang=Math.atan2(dz,dx);
+  [0.6,1.1].forEach(h=>{
+    const m=new THREE.Mesh(new THREE.BoxGeometry(len,0.09,0.09),railMat);
+    m.position.set((x1+x2)/2,h,(z1+z2)/2);m.rotation.y=-ang;m.castShadow=true;scene.add(m);});
+}
+function tree(mx,my,s=1){
+  const g=new THREE.Group();
+  const tr=new THREE.Mesh(new THREE.CylinderGeometry(0.35*s,0.5*s,3*s,6),
+    new THREE.MeshStandardMaterial({color:'#6b543a',roughness:1}));
+  tr.position.y=1.5*s;tr.castShadow=true;g.add(tr);
+  const f=new THREE.Mesh(new THREE.SphereGeometry(2.4*s,10,8),
+    new THREE.MeshStandardMaterial({color:'#5f7a3f',roughness:1}));
+  f.position.y=4.4*s;f.castShadow=true;g.add(f);
+  const f2=new THREE.Mesh(new THREE.SphereGeometry(1.7*s,10,8),
+    new THREE.MeshStandardMaterial({color:'#728c4a',roughness:1}));
+  f2.position.set(1.1*s,3.6*s,0.6*s);f2.castShadow=true;g.add(f2);
+  const[x,z]=M2(mx,my);g.position.set(x,0,z);scene.add(g);
+}
+function sprite(text,mx,my,h,color='#2b2a26'){
+  const c=document.createElement('canvas');c.width=512;c.height=128;
+  const g=c.getContext('2d');g.font='600 58px "Barlow Condensed","Arial Narrow",sans-serif';
+  g.textAlign='center';g.textBaseline='middle';
+  g.lineWidth=8;g.strokeStyle='rgba(251,249,244,.9)';g.strokeText(text,256,64);
+  g.fillStyle=color;g.fillText(text,256,64);
+  const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));
+  const[x,z]=M2(mx,my);s.position.set(x,h,z);s.scale.set(26,6.5,1);scene.add(s);
+}
 
-    <div class="card romain">
-      <div class="card-header">
-        <div>
-          <div class="card-dates">08 – 12 Avril</div>
-          <div class="card-lieu">Compiègne</div>
-        </div>
-        <div class="card-badge">Romain</div>
-      </div>
-      <div class="card-body">
-        <div class="card-label">Chevaux engagés</div>
-        <ul class="horses-list">
-          <li><span class="horse-icon">🐴</span>Channah Z</li>
-          <li><span class="horse-icon">🐴</span>Comme Convenu</li>
-          <li><span class="horse-icon">🐴</span>Diaron's</li>
-          <li><span class="horse-icon">🐴</span>Pearl</li>
-        </ul>
-      </div>
-      <div class="card-footer">
-        <div class="footer-label">Durée</div>
-        <div class="footer-jours">5<span>jours</span></div>
-      </div>
-    </div>
+/* ---- routes publiques ---- */
+plane(2,196,236,173,'#d8cfba',0.04);
+plane(33,4,208,15,'#d8cfba',0.04);
 
-    <div class="card both">
-      <div class="card-header">
-        <div>
-          <div class="card-dates">23 – 26 Avril</div>
-          <div class="card-lieu">Fontainebleau</div>
-        </div>
-        <div class="card-badge">Romain & Carla</div>
-      </div>
-      <div class="card-body">
-        <div class="card-label">Chevaux engagés</div>
-        <ul class="horses-list">
-          <li><span class="horse-icon">🐴</span>Channah Z</li>
-          <li><span class="horse-icon">🐴</span>Comme Convenu</li>
-          <li><span class="horse-icon">🐴</span>Hiva</li>
-          <li><span class="horse-icon">🐴</span>Goldikova</li>
-          <li><span class="horse-icon">🐴</span>How Are You</li>
-        </ul>
-      </div>
-      <div class="card-footer">
-        <div class="footer-label">Durée</div>
-        <div class="footer-jours">4<span>jours</span></div>
-      </div>
-    </div>
+/* ---- CHEMIN BLANC : portail -> est de la carrière -> derrière (sud) -> écurie ---- */
+const CHEMIN=[[199,175],[198,150],[194,110],[190,70],[186,45],[181,32],[174,18],
+              [150,15],[120,14],[90,15],[74,22],[70,40],[68,62],[65,78],
+              [50,84],[46,96],[51,106]];
+function ribbon(P,w,color,y){
+  for(let i=0;i<P.length-1;i++){
+    const[a1,b1]=M2(P[i][0],P[i][1]),[a2,b2]=M2(P[i+1][0],P[i+1][1]);
+    const dx=a2-a1,dz=b2-b1,len=Math.hypot(dx,dz);
+    const m=new THREE.Mesh(new THREE.PlaneGeometry(len+w*0.6,w),
+      new THREE.MeshStandardMaterial({color,roughness:1}));
+    m.rotation.x=-Math.PI/2;m.rotation.z=-Math.atan2(dz,dx);
+    m.position.set((a1+a2)/2,y,(b1+b2)/2);m.receiveShadow=true;scene.add(m);
+  }
+}
+ribbon(CHEMIN,9,'#b9b29c',0.09);
+ribbon(CHEMIN,7,'#fbfaf3',0.13);
+sprite('CHEMIN — derrière la carrière',204,118,4,'#4a4840');
 
-  </div>
-</div>
+/* ---- portail (validé) + parking camions ---- */
+box(5,1.6,0.4,'#3a352c',200,176,0.8);
+sprite('PORTAIL (215)',202,184,5,'#4a4840');
+plane(150,155,196,172,'#cfc7b5',0.05);
+for(let i=0;i<3;i++){box(2.4,3.4,7,['#5a5a5a','#6f6f6f','#4a4a4a'][i],158+i*13,163,1.7);}
+sprite('PARKING CAMIONS',172,163,5,'#4a4840');
 
-<!-- MAI -->
-<div class="month-section">
-  <div class="month-label">Mai 2026</div>
-  <div class="grid">
+/* ---- carrière (validée, ne bouge pas) — haie 3 m ---- */
+plane(96,38,172,78,'#e3d2ab',0.08,1);
+[[93,35,175,38],[93,35,95.5,81],[172.5,35,175,81],[121,78,175,81]].forEach(h=>{
+  box(Math.abs(h[2]-h[0]),1.7,Math.abs(h[3]-h[1]),'#59683d',(h[0]+h[2])/2,(h[1]+h[3])/2,0.85);
+});
+[[106,50],[126,65],[146,46],[155,68],[118,70]].forEach(j=>{
+  box(7,0.9,0.18,'#c65b34',j[0]+3.5,j[1],0.9);
+  box(0.3,1.2,0.3,'#efe7d6',j[0],j[1],0.6);box(0.3,1.2,0.3,'#efe7d6',j[0]+7,j[1],0.6);
+});
+sprite('CARRIÈRE 76×40 (216)',134,58,4);
 
-    <div class="card both">
-      <div class="card-header">
-        <div>
-          <div class="card-dates">07 – 10 Mai</div>
-          <div class="card-lieu">Bourg-en-Bresse</div>
-        </div>
-        <div class="card-badge">Romain & Carla</div>
-      </div>
-      <div class="card-body">
-        <div class="card-label">Chevaux engagés</div>
-        <ul class="horses-list">
-          <li><span class="horse-icon">🐴</span>Channah Z</li>
-          <li><span class="horse-icon">🐴</span>Comme Convenu</li>
-          <li><span class="horse-icon">🐴</span>Diaron's</li>
-          <li><span class="horse-icon">🐴</span>Goldikova</li>
-          <li><span class="horse-icon">🐴</span>How Are You</li>
-        </ul>
-      </div>
-      <div class="card-footer">
-        <div class="footer-label">Durée</div>
-        <div class="footer-jours">4<span>jours</span></div>
-      </div>
-    </div>
+/* ---- paddocks : 2 rangées de 5 SUPERPOSÉES, haut gauche (croquis) ---- */
+plane(14,170,64,188,'#b7c584',0.05);
+plane(14,146,64,164,'#b7c584',0.05);
+[[170,188],[146,164]].forEach(c=>{
+  rail([14,c[0]],[64,c[0]]);rail([64,c[0]],[64,c[1]]);
+  rail([64,c[1]],[14,c[1]]);rail([14,c[1]],[14,c[0]]);
+  for(let i=1;i<5;i++){const xx=14+50*i/5;rail([xx,c[0]],[xx,c[1]]);}
+});
+plane(14,164,64,170,'#ded6c3',0.05);
+sprite('PADDOCKS 5+5 (210)',39,167,5,'#3f4a2c');
 
-  </div>
-</div>
+/* ---- manège ---- */
+const man=building(25,66,7,4,'#c9bfa9','#b0a690');place(man,108.5,111);
+plane(98,80,119,142,'#e3d2ab',0.09,1);
+sprite('MANÈGE',108.5,115,12);
 
-<div class="page-footer">Programme Concours 2026 — Part 1 &nbsp;·&nbsp; Confidentiel</div>
+/* ---- barn en U + cour ---- */
+const bMat='#b3946a',bRoof='#7f6642';
+place(building(12,58,3.4,2.2,bMat,bRoof),90,111);
+place(building(10,44,3.4,2.2,bMat,bRoof),74,135,Math.PI/2);
+place(building(10,44,3.4,2.2,bMat,bRoof),74,87,Math.PI/2);
+plane(52,92,84,130,'#cfc7b5',0.05);
+[[58,98],[64,98],[70,98],[58,124],[64,124],[70,124],[76,111]].forEach((c,i)=>{
+  const col=['#31506e','#7a2f2f','#e8e4da','#3a3a3a','#556b4d','#8a7b52','#2f2f2f'][i%7];
+  box(2,1.4,4.2,col,c[0],c[1],0.7);
+});
+sprite('ÉCURIES',74,135,7,'#3d2f1e');
 
+/* ---- arbres ---- */
+for(let mx=84;mx<116;mx+=9){tree(mx,178+Math.random()*4-2,0.8+Math.random()*0.5);}
+[[205.0,162.7],[191.5,151.3],[203.4,138.4],[189.2,127.8],[201.0,114.5],[186.9,103.9],[198.6,90.7],[184.5,80.0],[196.0,66.4],[181.3,56.6],[191.6,41.5],[187.3,30.3],[181.7,19.0],[165.6,23.5],[153.7,22.0],[142.3,21.2],[130.3,20.8],[118.7,20.5],[106.7,20.9],[94.8,21.3],[80.6,12.0],[79.9,25.4],[64.6,34.3],[75.8,48.1],[61.8,58.9],[72.6,72.5],[57.8,73.9],[43.5,82.9],[40.4,99.3]]
+ .forEach(p=>tree(p[0],p[1],0.7));
+[[30,120],[232,150],[228,120],[226,90],[110,30],[150,120],[160,140]]
+ .forEach(t=>tree(t[0],t[1],0.8+Math.random()*0.4));
+
+/* ---- caméra ---- */
+const target=new THREE.Vector3(0,4,0);
+let theta=-0.7,phi=0.95,radius=260;
+const views={
+  iso:{theta:-0.7,phi:0.95,radius:260,t:[0,4,0]},
+  top:{theta:-0.0001,phi:0.02,radius:300,t:[0,4,0]},
+  carr:{theta:-0.9,phi:0.85,radius:130,t:[14,3,55]}
+};
+function applyCam(){
+  phi=Math.max(0.02,Math.min(1.45,phi));radius=Math.max(60,Math.min(560,radius));
+  camera.position.set(target.x+radius*Math.sin(phi)*Math.sin(theta),
+    target.y+radius*Math.cos(phi),target.z+radius*Math.sin(phi)*Math.cos(theta));
+  camera.lookAt(target);
+}
+const ptrs=new Map();
+let lastMid=null,lastDist=null,btn=0;
+function pan(dx,dy){const k=radius*0.0016;
+  const right=new THREE.Vector3(Math.cos(theta),0,-Math.sin(theta));
+  const fwd=new THREE.Vector3(Math.sin(theta),0,Math.cos(theta));
+  target.addScaledVector(right,-dx*k);target.addScaledVector(fwd,dy*k);}
+renderer.domElement.style.touchAction='none';
+renderer.domElement.addEventListener('pointerdown',e=>{
+  renderer.domElement.setPointerCapture(e.pointerId);
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});btn=e.button;
+  lastMid=null;lastDist=null;});
+function endPtr(e){ptrs.delete(e.pointerId);lastMid=null;lastDist=null;}
+addEventListener('pointerup',endPtr);addEventListener('pointercancel',endPtr);
+renderer.domElement.addEventListener('pointermove',e=>{
+  if(!ptrs.has(e.pointerId))return;
+  const prev=ptrs.get(e.pointerId);
+  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
+  if(ptrs.size===1){
+    const dx=e.clientX-prev.x,dy=e.clientY-prev.y;
+    if(btn===2){pan(dx,dy);}else{theta-=dx*0.005;phi-=dy*0.005;}
+    applyCam();
+  }else if(ptrs.size===2){
+    const P=[...ptrs.values()];
+    const mid={x:(P[0].x+P[1].x)/2,y:(P[0].y+P[1].y)/2};
+    const dist=Math.hypot(P[0].x-P[1].x,P[0].y-P[1].y);
+    if(lastMid){pan(mid.x-lastMid.x, mid.y-lastMid.y);}
+    if(lastDist){radius*=lastDist/dist;}
+    lastMid=mid;lastDist=dist;applyCam();
+  }
+});
+renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();radius*=(1+Math.sign(e.deltaY)*0.08);applyCam();},{passive:false});
+renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
+function tween(v){const s={theta,phi,radius,tx:target.x,ty:target.y,tz:target.z},t0=performance.now();
+  (function a(){const k=Math.min(1,(performance.now()-t0)/650),e=k<.5?2*k*k:1-Math.pow(-2*k+2,2)/2;
+   theta=s.theta+(v.theta-s.theta)*e;phi=s.phi+(v.phi-s.phi)*e;radius=s.radius+(v.radius-s.radius)*e;
+   target.set(s.tx+(v.t[0]-s.tx)*e,s.ty+(v.t[1]-s.ty)*e,s.tz+(v.t[2]-s.tz)*e);
+   applyCam();if(k<1)requestAnimationFrame(a);})();}
+document.getElementById('reset').onclick=()=>tween(views.iso);
+document.getElementById('top').onclick=()=>tween(views.top);
+document.getElementById('carr').onclick=()=>tween(views.carr);
+
+function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);}
+addEventListener('resize',resize);resize();applyCam();
+(function loop(){requestAnimationFrame(loop);renderer.render(scene,camera);})();
+</script>
 </body>
 </html>
