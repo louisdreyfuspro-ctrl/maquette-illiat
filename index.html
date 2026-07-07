@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
-<title>Domaine équestre — Illiat · Maquette 3D v13</title>
+<title>Domaine équestre — Illiat · Maquette 3D v14</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Spectral:wght@500&display=swap" rel="stylesheet">
 <style>
@@ -43,15 +43,16 @@
 </head>
 <body>
 <div id="app"></div>
-<div class="ui" id="title"><h1>Domaine équestre</h1><p>ILLIAT (01) · V13</p></div>
+<div class="ui" id="title"><h1>Domaine équestre</h1><p>ILLIAT (01) · V14</p></div>
 <div class="ui" id="legend">
   <h2>Installations</h2>
-  <div class="row"><span class="sw" style="background:#c9bfa9"></span>Manège couvert 25×66 (211)</div>
+  <div class="row"><span class="sw" style="background:#c9bfa9"></span>Manège couvert 66×25</div>
   <div class="row"><span class="sw" style="background:#b3946a"></span>Barn en U — écuries</div>
-  <div class="row"><span class="sw" style="background:#e3d2ab"></span>Carrière 76×40 (216)</div>
-  <div class="row"><span class="sw" style="background:#bcc98f"></span>Paddocks 5 face à 5 (210)</div>
-  <div class="row"><span class="sw" style="background:#fbfaf3"></span>Chemin blanc (portail → écurie)</div>
-  <div class="row"><span class="sw" style="background:#5f7042"></span>Haie périphérique</div>
+  <div class="row"><span class="sw" style="background:#e3d2ab"></span>Carrière 40×76</div>
+  <div class="row"><span class="sw" style="background:#bcc98f"></span>Paddocks 2×5</div>
+  <div class="row"><span class="sw" style="background:#b8a68a"></span>Marcheur rond</div>
+  <div class="row"><span class="sw" style="background:#a8a8a8"></span>Parking poids lourd</div>
+  <div class="row"><span class="sw" style="background:#fbfaf3"></span>Chemin d'accès + portail</div>
 </div>
 <div class="ui" id="controls">
   <button class="btn ghost" id="reset">Vue d'ensemble</button>
@@ -62,32 +63,34 @@
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
-const CX=120, CY=100;
+/* Coordonnées "plan" en mètres, calées sur la vue aérienne (échelle : manège = 66 m) */
+const CX=140, CY=140;
 const M2=(x,y)=>[x-CX,-(y-CY)];
 
 const scene=new THREE.Scene();
 scene.background=new THREE.Color('#c6d4e4');
-scene.fog=new THREE.Fog('#c6d4e4',240,620);
+scene.fog=new THREE.Fog('#c6d4e4',260,720);
 const renderer=new THREE.WebGLRenderer({antialias:true});
 renderer.setPixelRatio(Math.min(devicePixelRatio,2));
 renderer.shadowMap.enabled=true;renderer.shadowMap.type=THREE.PCFSoftShadowMap;
 renderer.outputEncoding=THREE.sRGBEncoding;
 document.getElementById('app').appendChild(renderer.domElement);
-const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,1,2000);
+const camera=new THREE.PerspectiveCamera(45,innerWidth/innerHeight,1,2200);
 
 scene.add(new THREE.HemisphereLight('#eaf1ff','#8a8462',0.85));
 const sun=new THREE.DirectionalLight('#fff4e0',1.05);
 sun.position.set(120,180,90);sun.castShadow=true;
 sun.shadow.mapSize.set(2048,2048);
-const d=180,sc=sun.shadow.camera;sc.left=-d;sc.right=d;sc.top=d;sc.bottom=-d;sc.near=10;sc.far=520;
+const d=240,sc=sun.shadow.camera;sc.left=-d;sc.right=d;sc.top=d;sc.bottom=-d;sc.near=10;sc.far=600;
 sun.shadow.bias=-0.0004;scene.add(sun);
 scene.add(new THREE.AmbientLight('#ffffff',0.18));
 
-const ground=new THREE.Mesh(new THREE.PlaneGeometry(1400,1400),
+const ground=new THREE.Mesh(new THREE.PlaneGeometry(1600,1600),
   new THREE.MeshStandardMaterial({color:'#98a86a',roughness:1}));
 ground.rotation.x=-Math.PI/2;ground.receiveShadow=true;scene.add(ground);
 
-const BOUND=[[10,195],[120,190],[230,172],[240,120],[224,58],[203,18],[120,10],[35,9],[6,72],[13,140],[10,195]];
+/* limite de propriété */
+const BOUND=[[10,103],[200,108],[240,92],[289,76],[315,92],[322,135],[305,185],[295,228],[200,220],[120,222],[60,238],[14,170],[10,103]];
 (()=>{const pts=BOUND.map(p=>{const[a,b]=M2(p[0],p[1]);return new THREE.Vector3(a,0.15,b);});
 scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts),
   new THREE.LineBasicMaterial({color:'#5b5a50'})));})();
@@ -137,22 +140,15 @@ function tree(mx,my,s=1){
 }
 function sprite(text,mx,my,h,color='#2b2a26'){
   const c=document.createElement('canvas');c.width=512;c.height=128;
-  const g=c.getContext('2d');g.font='600 58px "Barlow Condensed",sans-serif';
+  const g=c.getContext('2d');
+  let fs=58;g.font='600 '+fs+'px "Barlow Condensed",sans-serif';
+  while(g.measureText(text).width>470&&fs>28){fs-=4;g.font='600 '+fs+'px "Barlow Condensed",sans-serif';}
   g.textAlign='center';g.textBaseline='middle';
   g.lineWidth=8;g.strokeStyle='rgba(251,249,244,.9)';g.strokeText(text,256,64);
   g.fillStyle=color;g.fillText(text,256,64);
   const s=new THREE.Sprite(new THREE.SpriteMaterial({map:new THREE.CanvasTexture(c),depthTest:false,transparent:true}));
   const[x,z]=M2(mx,my);s.position.set(x,h,z);s.scale.set(26,6.5,1);scene.add(s);
 }
-
-/* ---- routes publiques ---- */
-plane(2,196,236,173,'#d8cfba',0.04);
-plane(33,4,208,15,'#d8cfba',0.04);
-
-/* ---- CHEMIN BLANC : portail -> est de la carrière -> derrière (sud) -> écurie ---- */
-const CHEMIN=[[199,175],[198,150],[194,110],[190,70],[186,45],[181,32],[174,18],
-              [150,15],[120,14],[90,15],[74,22],[70,40],[68,62],[65,78],
-              [50,84],[46,96],[51,106]];
 function ribbon(P,w,color,y){
   for(let i=0;i<P.length-1;i++){
     const[a1,b1]=M2(P[i][0],P[i][1]),[a2,b2]=M2(P[i+1][0],P[i+1][1]);
@@ -163,73 +159,116 @@ function ribbon(P,w,color,y){
     m.position.set((a1+a2)/2,y,(b1+b2)/2);m.receiveShadow=true;scene.add(m);
   }
 }
+
+/* ---- champs cultivés (hors pâture) ---- */
+plane(0,0,345,100,'#d8cbb0',0.03);
+plane(55,232,345,330,'#cfc0a2',0.03);
+
+/* ---- route au nord-est (le long des bois) + chemin d'accès -> parking ---- */
+ribbon([[345,45],[320,58],[300,70],[289,78],[276,90]],6,'#d8cfba',0.04);
+const CHEMIN=[[289,78],[266,88],[243,100],[222,112],[206,121],[197,128],[190,135]];
 ribbon(CHEMIN,9,'#b9b29c',0.09);
 ribbon(CHEMIN,7,'#fbfaf3',0.13);
-sprite('CHEMIN — derrière la carrière',204,118,4,'#4a4840');
+sprite("CHEMIN D'ACCÈS",240,96,5,'#4a4840');
+box(6,1.6,0.4,'#3a352c',291,79,0.8);
+sprite('PORTAIL',296,70,5,'#4a4840');
 
-/* ---- portail (validé) + parking camions ---- */
-box(5,1.6,0.4,'#3a352c',200,176,0.8);
-sprite('PORTAIL (215)',202,184,5,'#4a4840');
-plane(150,155,196,172,'#cfc7b5',0.05);
-for(let i=0;i<3;i++){box(2.4,3.4,7,['#5a5a5a','#6f6f6f','#4a4a4a'][i],158+i*13,163,1.7);}
-sprite('PARKING CAMIONS',172,163,5,'#4a4840');
+/* ---- piste au sud (existante) ---- */
+ribbon([[0,262],[60,240],[130,227],[200,221],[280,222],[345,230]],5,'#d8cfba',0.04);
+ribbon([[88,230],[100,223],[112,216]],4,'#d8cfba',0.05);
 
-/* ---- carrière (validée, ne bouge pas) — haie 3 m ---- */
-plane(96,38,172,78,'#e3d2ab',0.08,1);
-[[93,35,175,38],[93,35,95.5,81],[172.5,35,175,81],[121,78,175,81]].forEach(h=>{
+/* ---- parking poids lourd (est du manège) ---- */
+plane(174,119,199,152,'#b5b5b5',0.05);
+for(let i=0;i<3;i++){box(7,3.4,2.4,['#5a5a5a','#6f6f6f','#4a4a4a'][i],186,127+i*10,1.7);}
+sprite('PARKING POIDS LOURD',187,146,6,'#4a4840');
+
+/* ---- paddocks : 2 blocs de 5, à l'ouest ---- */
+function paddockBlock(x0,y0,x1,y1,n){
+  plane(x0,y0,x1,y1,'#b7c584',0.05);
+  rail([x0,y0],[x1,y0]);rail([x1,y0],[x1,y1]);rail([x1,y1],[x0,y1]);rail([x0,y1],[x0,y0]);
+  for(let i=1;i<n;i++){const yy=y0+(y1-y0)*i/n;rail([x0,yy],[x1,yy]);}
+}
+paddockBlock(13,109,48,164,5);
+paddockBlock(58,109,93,164,5);
+sprite('5 PADDOCKS',30,136,6,'#3f4a2c');
+sprite('5 PADDOCKS',75,136,6,'#3f4a2c');
+
+/* ---- haie existante entre paddocks et manège ---- */
+box(1.5,2.5,60,'#5f7042',97,140,1.25);
+[112,124,136,150,162].forEach(y=>tree(97,y,0.6));
+
+/* ---- manège 66×25 sur le sable actuel ---- */
+const man=building(25,66,7,4,'#c9bfa9','#b0a690');place(man,141,133.5,Math.PI/2);
+sprite('MANÈGE',141,128,12);
+
+/* ---- barn en U (ouverture au sud) + cour ---- */
+const bMat='#b3946a',bRoof='#7f6642';
+place(building(10,34,3.4,2.2,bMat,bRoof),118,157,Math.PI/2);
+place(building(10,18,3.4,2.2,bMat,bRoof),106,171);
+place(building(10,18,3.4,2.2,bMat,bRoof),130,171);
+plane(111,162,125,182,'#cfc7b5',0.05);
+[[114,167],[118,167],[122,167],[114,176],[122,176]].forEach((c,i)=>{
+  const col=['#31506e','#7a2f2f','#e8e4da','#556b4d','#2f2f2f'][i%5];
+  box(2,1.4,4.2,col,c[0],c[1],0.7);
+});
+sprite('ÉCURIES',118,153,8,'#3d2f1e');
+
+/* ---- carrière 40×76 (nord-sud, à droite du barn) ---- */
+plane(141,154,181,230,'#e3d2ab',0.08,1);
+[[140,153,142,231],[180,153,182,231],[140,229,182,231],[140,153,155,155],[167,153,182,155]].forEach(h=>{
   box(Math.abs(h[2]-h[0]),1.7,Math.abs(h[3]-h[1]),'#59683d',(h[0]+h[2])/2,(h[1]+h[3])/2,0.85);
 });
-[[106,50],[126,65],[146,46],[155,68],[118,70]].forEach(j=>{
+[[147,170],[163,184],[148,200],[164,212]].forEach(j=>{
   box(7,0.9,0.18,'#c65b34',j[0]+3.5,j[1],0.9);
   box(0.3,1.2,0.3,'#efe7d6',j[0],j[1],0.6);box(0.3,1.2,0.3,'#efe7d6',j[0]+7,j[1],0.6);
 });
-sprite('CARRIÈRE 76×40 (216)',134,58,4);
+sprite('CARRIÈRE 40×76',161,192,4);
 
-/* ---- paddocks : 2 rangées de 5 SUPERPOSÉES, haut gauche (croquis) ---- */
-plane(14,170,64,188,'#b7c584',0.05);
-plane(14,146,64,164,'#b7c584',0.05);
-[[170,188],[146,164]].forEach(c=>{
-  rail([14,c[0]],[64,c[0]]);rail([64,c[0]],[64,c[1]]);
-  rail([64,c[1]],[14,c[1]]);rail([14,c[1]],[14,c[0]]);
-  for(let i=1;i<5;i++){const xx=14+50*i/5;rail([xx,c[0]],[xx,c[1]]);}
-});
-plane(14,164,64,170,'#ded6c3',0.05);
-sprite('PADDOCKS 5+5 (210)',39,167,5,'#3f4a2c');
+/* ---- marcheur rond (M) ---- */
+(function(){
+  const[dx,dz]=M2(126,196);
+  const disc=new THREE.Mesh(new THREE.CircleGeometry(10,36),
+    new THREE.MeshStandardMaterial({color:'#e0d0a8',roughness:1}));
+  disc.rotation.x=-Math.PI/2;disc.position.set(dx,0.08,dz);disc.receiveShadow=true;scene.add(disc);
+  [10,4].forEach(r=>{
+    [0.6,1.1].forEach(h=>{
+      const t=new THREE.Mesh(new THREE.TorusGeometry(r,0.06,6,48),railMat);
+      t.rotation.x=Math.PI/2;t.position.set(dx,h,dz);scene.add(t);});
+    for(let a=0;a<12;a++){
+      const p=new THREE.Mesh(new THREE.BoxGeometry(0.14,1.3,0.14),railMat);
+      p.position.set(dx+r*Math.cos(a/12*2*Math.PI),0.65,dz+r*Math.sin(a/12*2*Math.PI));
+      p.castShadow=true;scene.add(p);}
+  });
+  const grey=new THREE.MeshStandardMaterial({color:'#6f6f6f',roughness:.8});
+  const mast=new THREE.Mesh(new THREE.CylinderGeometry(0.25,0.25,3.4,8),grey);
+  mast.position.set(dx,1.7,dz);mast.castShadow=true;scene.add(mast);
+  for(let a=0;a<4;a++){
+    const arm=new THREE.Mesh(new THREE.BoxGeometry(6.5,0.12,0.3),grey);
+    arm.position.set(dx+3.4*Math.cos(a*Math.PI/2),3.1,dz+3.4*Math.sin(a*Math.PI/2));
+    arm.rotation.y=-a*Math.PI/2;arm.castShadow=true;scene.add(arm);}
+})();
+sprite('MARCHEUR (M)',126,190,6,'#4a4840');
 
-/* ---- manège ---- */
-const man=building(25,66,7,4,'#c9bfa9','#b0a690');place(man,108.5,111);
-plane(98,80,119,142,'#e3d2ab',0.09,1);
-sprite('MANÈGE',108.5,115,12);
+/* ---- bâtiments existants au sud ---- */
+box(22,3.2,7,'#8a8378',126,213.5,1.6);
+box(8,2.8,6,'#7d7668',94,218,1.4);
 
-/* ---- barn en U + cour ---- */
-const bMat='#b3946a',bRoof='#7f6642';
-place(building(12,58,3.4,2.2,bMat,bRoof),90,111);
-place(building(10,44,3.4,2.2,bMat,bRoof),74,135,Math.PI/2);
-place(building(10,44,3.4,2.2,bMat,bRoof),74,87,Math.PI/2);
-plane(52,92,84,130,'#cfc7b5',0.05);
-[[58,98],[64,98],[70,98],[58,124],[64,124],[70,124],[76,111]].forEach((c,i)=>{
-  const col=['#31506e','#7a2f2f','#e8e4da','#3a3a3a','#556b4d','#8a7b52','#2f2f2f'][i%7];
-  box(2,1.4,4.2,col,c[0],c[1],0.7);
-});
-sprite('ÉCURIES',74,135,7,'#3d2f1e');
-
-/* ---- arbres ---- */
-for(let mx=84;mx<116;mx+=9){tree(mx,178+Math.random()*4-2,0.8+Math.random()*0.5);}
-[[205.0,162.7],[191.5,151.3],[203.4,138.4],[189.2,127.8],[201.0,114.5],[186.9,103.9],[198.6,90.7],[184.5,80.0],[196.0,66.4],[181.3,56.6],[191.6,41.5],[187.3,30.3],[181.7,19.0],[165.6,23.5],[153.7,22.0],[142.3,21.2],[130.3,20.8],[118.7,20.5],[106.7,20.9],[94.8,21.3],[80.6,12.0],[79.9,25.4],[64.6,34.3],[75.8,48.1],[61.8,58.9],[72.6,72.5],[57.8,73.9],[43.5,82.9],[40.4,99.3]]
- .forEach(p=>tree(p[0],p[1],0.7));
-[[30,120],[232,150],[228,120],[226,90],[110,30],[150,120],[160,140]]
- .forEach(t=>tree(t[0],t[1],0.8+Math.random()*0.4));
+/* ---- arbres : grand bois au nord + lisière nord-est ---- */
+for(let i=0;i<26;i++){tree(105+Math.random()*100,6+Math.random()*52,0.8+Math.random()*0.6);}
+for(let i=0;i<14;i++){const t=i/13;tree(205+95*t+(Math.random()*8-4),56+38*t+(Math.random()*8-4),0.75+Math.random()*0.4);}
+[[255,94],[232,108],[214,118]].forEach(p=>tree(p[0],p[1],0.6));
+[[20,255],[150,233],[300,236],[50,100],[8,120],[310,140],[300,190]].forEach(p=>tree(p[0],p[1],0.7+Math.random()*0.3));
 
 /* ---- caméra ---- */
 const target=new THREE.Vector3(0,4,0);
-let theta=-0.7,phi=0.95,radius=260;
+let theta=-0.7,phi=0.95,radius=280;
 const views={
-  iso:{theta:-0.7,phi:0.95,radius:260,t:[0,4,0]},
-  top:{theta:-0.0001,phi:0.02,radius:300,t:[0,4,0]},
-  carr:{theta:-0.9,phi:0.85,radius:130,t:[14,3,55]}
+  iso:{theta:-0.7,phi:0.95,radius:280,t:[0,4,0]},
+  top:{theta:-0.0001,phi:0.02,radius:330,t:[0,4,0]},
+  carr:{theta:-0.9,phi:0.85,radius:130,t:[21,3,-52]}
 };
 function applyCam(){
-  phi=Math.max(0.02,Math.min(1.45,phi));radius=Math.max(60,Math.min(560,radius));
+  phi=Math.max(0.02,Math.min(1.45,phi));radius=Math.max(60,Math.min(650,radius));
   camera.position.set(target.x+radius*Math.sin(phi)*Math.sin(theta),
     target.y+radius*Math.cos(phi),target.z+radius*Math.sin(phi)*Math.cos(theta));
   camera.lookAt(target);
