@@ -65,7 +65,7 @@
 <script>
 /* Coordonnées "plan" en mètres, calées sur la vue aérienne (échelle : manège = 66 m) */
 const CX=140, CY=140;
-const M2=(x,y)=>[x-CX,-(y-CY)];
+const M2=(x,y)=>[x-CX,y-CY];
 
 const scene=new THREE.Scene();
 scene.background=new THREE.Color('#c6d4e4');
@@ -261,11 +261,12 @@ for(let i=0;i<14;i++){const t=i/13;tree(205+95*t+(Math.random()*8-4),56+38*t+(Ma
 
 /* ---- caméra ---- */
 const target=new THREE.Vector3(0,4,0);
+/* caméra côté sud : gauche/droite identiques à la photo aérienne (nord en haut) */
 let theta=-0.7,phi=0.95,radius=280;
 const views={
   iso:{theta:-0.7,phi:0.95,radius:280,t:[0,4,0]},
   top:{theta:-0.0001,phi:0.02,radius:330,t:[0,4,0]},
-  carr:{theta:-0.9,phi:0.85,radius:130,t:[21,3,-52]}
+  carr:{theta:-0.9,phi:0.85,radius:130,t:[21,3,52]}
 };
 function applyCam(){
   phi=Math.max(0.02,Math.min(1.45,phi));radius=Math.max(60,Math.min(650,radius));
