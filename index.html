@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Programme Concours 2026 — Part 1</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0e1b35;
+    --navy-light: #162240;
+    --gold: #c9a84c;
+    --gold-light: #e2c47a;
+    --white: #ffffff;
+    --gray: #a0aec0;
+    --romain: #3b82f6;
+    --carla: #f97316;
+    --both: #a855f7;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--navy);
+    font-family: 'Montserrat', sans-serif;
+    color: var(--white);
+    min-height: 100vh;
+    padding: 0;
+  }
+
+  /* ── HEADER ─────────────────────────────────── */
+  .header {
+    text-align: center;
+    padding: 50px 40px 30px;
+    border-bottom: 1px solid rgba(201,168,76,0.3);
+    position: relative;
+    overflow: hidden;
+  }
+  .header::before {
+    content: '';
+    position: absolute;
+    top: -80px; left: 50%;
+    transform: translateX(-50%);
+    width: 600px; height: 300px;
+    background: radial-gradient(ellipse, rgba(201,168,76,0.12) 0%, transparent 70%);
+    pointer-events: none;
+  }
+
+  .header-sub {
+    font-size: 11px;
+    letter-spacing: 4px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .header-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(32px, 6vw, 60px);
+    font-weight: 900;
+    color: var(--white);
+    line-height: 1.1;
+    letter-spacing: -1px;
+    margin-bottom: 8px;
+  }
+
+  .header-title span { color: var(--gold); }
+
+  .header-dates {
+    font-size: 13px;
+    color: var(--gray);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-weight: 500;
+    margin-top: 16px;
+  }
+
+  /* ── LÉGENDE ─────────────────────────────────── */
+  .legend {
+    display: flex;
+    justify-content: center;
+    gap: 32px;
+    padding: 20px 40px;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    flex-wrap: wrap;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+  }
+  .legend-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .dot-romain { background: var(--romain); }
+  .dot-carla  { background: var(--carla); }
+  .dot-both   { background: var(--both); }
+
+  /* ── GRID CONCOURS ───────────────────────────── */
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1px;
+    background: rgba(255,255,255,0.06);
+    margin: 0;
+  }
+
+  /* ── CARD ────────────────────────────────────── */
+  .card {
+    background: var(--navy-light);
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+    transition: background 0.2s;
+  }
+  .card:hover { background: #1c2d52; }
+
+  .card-header {
+    padding: 20px 24px 16px;
+    border-bottom: 2px solid;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .card.romain .card-header { border-color: var(--romain); }
+  .card.carla  .card-header { border-color: var(--carla); }
+  .card.both   .card-header { border-color: var(--both); }
+
+  .card-dates {
+    font-family: 'Playfair Display', serif;
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.2;
+  }
+
+  .card-lieu {
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 600;
+    margin-top: 4px;
+  }
+
+  .card-badge {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 10px;
+    border-radius: 20px;
+    white-space: nowrap;
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  .card.romain .card-badge { background: rgba(59,130,246,0.2); color: #93c5fd; }
+  .card.carla  .card-badge { background: rgba(249,115,22,0.2);  color: #fdba74; }
+  .card.both   .card-badge { background: rgba(168,85,247,0.2);  color: #d8b4fe; }
+
+  .card-body {
+    padding: 16px 24px 20px;
+    flex: 1;
+  }
+
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+    font-weight: 600;
+    margin-bottom: 10px;
+  }
+
+  .horses-list {
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .horses-list li {
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 10px;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    border-left: 2px solid rgba(201,168,76,0.4);
+  }
+  .horse-icon {
+    font-size: 14px;
+    flex-shrink: 0;
+  }
+
+  .card-footer {
+    padding: 12px 24px;
+    border-top: 1px solid rgba(255,255,255,0.06);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .footer-label {
+    font-size: 10px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--gray);
+    font-weight: 600;
+  }
+  .footer-jours {
+    font-family: 'Playfair Display', serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--gold);
+  }
+  .footer-jours span {
+    font-family: 'Montserrat', sans-serif;
+    font-size: 10px;
+    color: var(--gray);
+    font-weight: 500;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-left: 4px;
+  }
+
+  /* ── SECTION MONTH ───────────────────────────── */
+  .month-section { margin-bottom: 0; }
+
+  .month-label {
+    padding: 14px 24px;
+    background: rgba(201,168,76,0.08);
+    border-left: 3px solid var(--gold);
+    font-size: 11px;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+    color: var(--gold);
+    font-weight: 700;
+  }
+
+  /* ── FOOTER ──────────────────────────────────── */
+  .page-footer {
+    text-align: center;
+    padding: 32px 40px;
+    border-top: 1px solid rgba(201,168,76,0.2);
+    font-size: 10px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    color: rgba(160,174,192,0.6);
+  }
+
+  @media (max-width: 600px) {
+    .header { padding: 36px 20px 24px; }
+    .legend { gap: 16px; padding: 16px 20px; }
+    .grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-sub">Saison Hippique</div>
+  <div class="header-title">Programme<br><span>Concours 2026</span></div>
+  <div class="header-sub" style="margin-top:4px;">Part 1</div>
+  <div class="header-dates">Mars · Avril · Mai 2026</div>
+</div>
+
+<!-- LÉGENDE -->
+<div class="legend">
+  <div class="legend-item"><div class="legend-dot dot-romain"></div> Romain</div>
+  <div class="legend-item"><div class="legend-dot dot-carla"></div> Carla</div>
+  <div class="legend-item"><div class="legend-dot dot-both"></div> Romain & Carla</div>
+</div>
+
+<!-- MARS -->
+<div class="month-section">
+  <div class="month-label">Mars 2026</div>
+  <div class="grid">
+
+    <div class="card both">
+      <div class="card-header">
+        <div>
+          <div class="card-dates">12 – 15 Mars</div>
+          <div class="card-lieu">Gassin</div>
+        </div>
+        <div class="card-badge">Romain & Carla</div>
+      </div>
+      <div class="card-body">
+        <div class="card-label">Chevaux engagés</div>
+        <ul class="horses-list">
+          <li><span class="horse-icon">🐴</span>Channah Z</li>
+          <li><span class="horse-icon">🐴</span>Comme Convenu</li>
+          <li><span class="horse-icon">🐴</span>Flamme</li>
+          <li><span class="horse-icon">🐴</span>Jasmine</li>
+          <li><span class="horse-icon">🐴</span>How Are You</li>
+          <li><span class="horse-icon">🐴</span>Goldikova</li>
+          <li><span class="horse-icon">🐴</span>Diaron's</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="footer-label">Durée</div>
+        <div class="footer-jours">4<span>jours</span></div>
+      </div>
+    </div>
+
+    <div class="card romain">
+      <div class="card-header">
+        <div>
+          <div class="card-dates">26 – 29 Mars</div>
+          <div class="card-lieu">Cluny</div>
+        </div>
+        <div class="card-badge">Romain</div>
+      </div>
+      <div class="card-body">
+        <div class="card-label">Chevaux engagés</div>
+        <ul class="horses-list">
+          <li><span class="horse-icon">🐴</span>Flamme</li>
+          <li><span class="horse-icon">🐴</span>Hiva</li>
+          <li><span class="horse-icon">🐴</span>Diaron's</li>
+          <li><span class="horse-icon">🐴</span>Jasmine</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="footer-label">Durée</div>
+        <div class="footer-jours">4<span>jours</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- AVRIL -->
+<div class="month-section">
+  <div class="month-label">Avril 2026</div>
+  <div class="grid">
+
+    <div class="card carla">
+      <div class="card-header">
+        <div>
+          <div class="card-dates">02 – 12 Avril</div>
+          <div class="card-lieu">Gassin</div>
+        </div>
+        <div class="card-badge">Carla</div>
+      </div>
+      <div class="card-body">
+        <div class="card-label">Chevaux engagés</div>
+        <ul class="horses-list">
+          <li><span class="horse-icon">🐴</span>How Are You</li>
+          <li><span class="horse-icon">🐴</span>Goldikova</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="footer-label">Durée</div>
+        <div class="footer-jours">10<span>jours</span></div>
+      </div>
+    </div>
+
+    <div class="card romain">
+      <div class="card-header">
+        <div>
+          <div class="card-dates">08 – 12 Avril</div>
+          <div class="card-lieu">Compiègne</div>
+        </div>
+        <div class="card-badge">Romain</div>
+      </div>
+      <div class="card-body">
+        <div class="card-label">Chevaux engagés</div>
+        <ul class="horses-list">
+          <li><span class="horse-icon">🐴</span>Channah Z</li>
+          <li><span class="horse-icon">🐴</span>Comme Convenu</li>
+          <li><span class="horse-icon">🐴</span>Diaron's</li>
+          <li><span class="horse-icon">🐴</span>Pearl</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="footer-label">Durée</div>
+        <div class="footer-jours">5<span>jours</span></div>
+      </div>
+    </div>
+
+    <div class="card both">
+      <div class="card-header">
+        <div>
+          <div class="card-dates">23 – 26 Avril</div>
+          <div class="card-lieu">Fontainebleau</div>
+        </div>
+        <div class="card-badge">Romain & Carla</div>
+      </div>
+      <div class="card-body">
+        <div class="card-label">Chevaux engagés</div>
+        <ul class="horses-list">
+          <li><span class="horse-icon">🐴</span>Channah Z</li>
+          <li><span class="horse-icon">🐴</span>Comme Convenu</li>
+          <li><span class="horse-icon">🐴</span>Hiva</li>
+          <li><span class="horse-icon">🐴</span>Goldikova</li>
+          <li><span class="horse-icon">🐴</span>How Are You</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="footer-label">Durée</div>
+        <div class="footer-jours">4<span>jours</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- MAI -->
+<div class="month-section">
+  <div class="month-label">Mai 2026</div>
+  <div class="grid">
+
+    <div class="card both">
+      <div class="card-header">
+        <div>
+          <div class="card-dates">07 – 10 Mai</div>
+          <div class="card-lieu">Bourg-en-Bresse</div>
+        </div>
+        <div class="card-badge">Romain & Carla</div>
+      </div>
+      <div class="card-body">
+        <div class="card-label">Chevaux engagés</div>
+        <ul class="horses-list">
+          <li><span class="horse-icon">🐴</span>Channah Z</li>
+          <li><span class="horse-icon">🐴</span>Comme Convenu</li>
+          <li><span class="horse-icon">🐴</span>Diaron's</li>
+          <li><span class="horse-icon">🐴</span>Goldikova</li>
+          <li><span class="horse-icon">🐴</span>How Are You</li>
+        </ul>
+      </div>
+      <div class="card-footer">
+        <div class="footer-label">Durée</div>
+        <div class="footer-jours">4<span>jours</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<div class="page-footer">Programme Concours 2026 — Part 1 &nbsp;·&nbsp; Confidentiel</div>
+
+</body>
+</html>
