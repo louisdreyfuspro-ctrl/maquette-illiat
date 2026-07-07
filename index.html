@@ -4,12 +4,14 @@
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
 <title>Domaine équestre — Illiat · Maquette 3D v13</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Spectral:wght@500&display=swap" rel="stylesheet">
 <style>
-  html,body{margin:0;height:100%;overflow:hidden;background:#cdd8e6;font-family:'Barlow Condensed','Avenir Next Condensed','Arial Narrow',system-ui,sans-serif;}
+  html,body{margin:0;height:100%;overflow:hidden;background:#cdd8e6;font-family:'Barlow Condensed',system-ui,sans-serif;}
   #app{position:fixed;inset:0;} canvas{display:block;}
   .ui{position:fixed;pointer-events:none;color:#26241f;}
   #title{left:22px;top:18px;}
-  #title h1{font-family:'Spectral',Georgia,'Times New Roman',serif;font-weight:500;font-size:26px;margin:0;color:#2b2a26;}
+  #title h1{font-family:'Spectral',serif;font-weight:500;font-size:26px;margin:0;color:#2b2a26;}
   #title p{margin:2px 0 0;font-size:14px;letter-spacing:2px;text-transform:uppercase;color:#5c5a52;}
   #legend{right:20px;top:18px;background:rgba(251,249,244,.86);backdrop-filter:blur(6px);
     border:1px solid #c9c2b0;border-radius:10px;padding:14px 16px;pointer-events:auto;min-width:200px;
@@ -27,7 +29,7 @@
 </head>
 <body>
 <div id="app"></div>
-<div class="ui" id="title"><h1>Domaine équestre</h1><p>ILLIAT (01) · V13 · partage mobile</p></div>
+<div class="ui" id="title"><h1>Domaine équestre</h1><p>ILLIAT (01) · V13</p></div>
 <div class="ui" id="legend">
   <h2>Installations</h2>
   <div class="row"><span class="sw" style="background:#c9bfa9"></span>Manège couvert 25×66 (211)</div>
@@ -42,7 +44,7 @@
   <button class="btn ghost" id="top">Vue plan</button>
   <button class="btn ghost" id="carr">Vue carrière</button>
 </div>
-<div class="ui" id="hint"><span>1 doigt : pivoter · pincer : zoomer · 2 doigts : déplacer</span></div>
+<div class="ui" id="hint"><span>Glisser pour pivoter · molette pour zoomer · clic droit pour déplacer</span></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -121,7 +123,7 @@ function tree(mx,my,s=1){
 }
 function sprite(text,mx,my,h,color='#2b2a26'){
   const c=document.createElement('canvas');c.width=512;c.height=128;
-  const g=c.getContext('2d');g.font='600 58px "Barlow Condensed","Arial Narrow",sans-serif';
+  const g=c.getContext('2d');g.font='600 58px "Barlow Condensed",sans-serif';
   g.textAlign='center';g.textBaseline='middle';
   g.lineWidth=8;g.strokeStyle='rgba(251,249,244,.9)';g.strokeText(text,256,64);
   g.fillStyle=color;g.fillText(text,256,64);
@@ -218,35 +220,17 @@ function applyCam(){
     target.y+radius*Math.cos(phi),target.z+radius*Math.sin(phi)*Math.cos(theta));
   camera.lookAt(target);
 }
-const ptrs=new Map();
-let lastMid=null,lastDist=null,btn=0;
-function pan(dx,dy){const k=radius*0.0016;
-  const right=new THREE.Vector3(Math.cos(theta),0,-Math.sin(theta));
-  const fwd=new THREE.Vector3(Math.sin(theta),0,Math.cos(theta));
-  target.addScaledVector(right,-dx*k);target.addScaledVector(fwd,dy*k);}
-renderer.domElement.style.touchAction='none';
-renderer.domElement.addEventListener('pointerdown',e=>{
-  renderer.domElement.setPointerCapture(e.pointerId);
-  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});btn=e.button;
-  lastMid=null;lastDist=null;});
-function endPtr(e){ptrs.delete(e.pointerId);lastMid=null;lastDist=null;}
-addEventListener('pointerup',endPtr);addEventListener('pointercancel',endPtr);
-renderer.domElement.addEventListener('pointermove',e=>{
-  if(!ptrs.has(e.pointerId))return;
-  const prev=ptrs.get(e.pointerId);
-  ptrs.set(e.pointerId,{x:e.clientX,y:e.clientY});
-  if(ptrs.size===1){
-    const dx=e.clientX-prev.x,dy=e.clientY-prev.y;
-    if(btn===2){pan(dx,dy);}else{theta-=dx*0.005;phi-=dy*0.005;}
-    applyCam();
-  }else if(ptrs.size===2){
-    const P=[...ptrs.values()];
-    const mid={x:(P[0].x+P[1].x)/2,y:(P[0].y+P[1].y)/2};
-    const dist=Math.hypot(P[0].x-P[1].x,P[0].y-P[1].y);
-    if(lastMid){pan(mid.x-lastMid.x, mid.y-lastMid.y);}
-    if(lastDist){radius*=lastDist/dist;}
-    lastMid=mid;lastDist=dist;applyCam();
-  }
+let drag=null,px=0,py=0;
+renderer.domElement.addEventListener('pointerdown',e=>{drag=e.button;px=e.clientX;py=e.clientY;});
+addEventListener('pointerup',()=>drag=null);
+addEventListener('pointermove',e=>{
+  if(drag===null)return;const dx=e.clientX-px,dy=e.clientY-py;px=e.clientX;py=e.clientY;
+  if(drag===0){theta-=dx*0.005;phi-=dy*0.005;}
+  else{const pan=radius*0.0016;
+    const right=new THREE.Vector3(Math.cos(theta),0,-Math.sin(theta));
+    const fwd=new THREE.Vector3(Math.sin(theta),0,Math.cos(theta));
+    target.addScaledVector(right,-dx*pan);target.addScaledVector(fwd,dy*pan);}
+  applyCam();
 });
 renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();radius*=(1+Math.sign(e.deltaY)*0.08);applyCam();},{passive:false});
 renderer.domElement.addEventListener('contextmenu',e=>e.preventDefault());
