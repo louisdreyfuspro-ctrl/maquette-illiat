@@ -48,7 +48,7 @@
   <h2>Installations</h2>
   <div class="row"><span class="sw" style="background:#c9bfa9"></span>Manège couvert 66×25</div>
   <div class="row"><span class="sw" style="background:#b3946a"></span>Barn en U — écuries</div>
-  <div class="row"><span class="sw" style="background:#e3d2ab"></span>Carrière 40×76</div>
+  <div class="row"><span class="sw" style="background:#e3d2ab"></span>Carrière</div>
   <div class="row"><span class="sw" style="background:#bcc98f"></span>Paddocks 2×5</div>
   <div class="row"><span class="sw" style="background:#b8a68a"></span>Marcheur rond</div>
   <div class="row"><span class="sw" style="background:#a8a8a8"></span>Parking poids lourd</div>
@@ -188,10 +188,10 @@ function paddockBlock(x0,y0,x1,y1,n){
   rail([x0,y0],[x1,y0]);rail([x1,y0],[x1,y1]);rail([x1,y1],[x0,y1]);rail([x0,y1],[x0,y0]);
   for(let i=1;i<n;i++){const yy=y0+(y1-y0)*i/n;rail([x0,yy],[x1,yy]);}
 }
-paddockBlock(13,109,48,164,5);
-paddockBlock(58,109,93,164,5);
-sprite('5 PADDOCKS',30,136,6,'#3f4a2c');
-sprite('5 PADDOCKS',75,136,6,'#3f4a2c');
+paddockBlock(48,112,68,162,5);
+paddockBlock(73,112,93,162,5);
+sprite('5 PADDOCKS',58,108,6,'#3f4a2c');
+sprite('5 PADDOCKS',83,166,6,'#3f4a2c');
 
 /* ---- haie existante entre paddocks et manège ---- */
 box(1.5,2.5,60,'#5f7042',97,140,1.25);
@@ -201,28 +201,28 @@ box(1.5,2.5,60,'#5f7042',97,140,1.25);
 const man=building(25,66,7,4,'#c9bfa9','#b0a690');place(man,141,133.5,Math.PI/2);
 sprite('MANÈGE',141,128,12);
 
-/* ---- barn en U (ouverture au sud) + cour ---- */
+/* ---- barn en U (ouverture au sud), collé au manège ---- */
 const bMat='#b3946a',bRoof='#7f6642';
-place(building(10,34,3.4,2.2,bMat,bRoof),118,157,Math.PI/2);
-place(building(10,18,3.4,2.2,bMat,bRoof),106,171);
-place(building(10,18,3.4,2.2,bMat,bRoof),130,171);
-plane(111,162,125,182,'#cfc7b5',0.05);
-[[114,167],[118,167],[122,167],[114,176],[122,176]].forEach((c,i)=>{
+place(building(12,42,3.4,2.2,bMat,bRoof),119,152,Math.PI/2);
+place(building(12,22,3.4,2.2,bMat,bRoof),104,169);
+place(building(12,22,3.4,2.2,bMat,bRoof),134,169);
+plane(110,158,128,184,'#cfc7b5',0.05);
+[[113,166],[119,166],[125,166],[113,176],[125,176]].forEach((c,i)=>{
   const col=['#31506e','#7a2f2f','#e8e4da','#556b4d','#2f2f2f'][i%5];
   box(2,1.4,4.2,col,c[0],c[1],0.7);
 });
-sprite('ÉCURIES',118,153,8,'#3d2f1e');
+sprite('ÉCURIES',119,150,8,'#3d2f1e');
 
-/* ---- carrière 40×76 (nord-sud, à droite du barn) ---- */
-plane(141,154,181,230,'#e3d2ab',0.08,1);
-[[140,153,142,231],[180,153,182,231],[140,229,182,231],[140,153,155,155],[167,153,182,155]].forEach(h=>{
+/* ---- carrière (nord-sud), écartée du barn : un paddock passe entre les deux ---- */
+plane(155,154,195,230,'#e3d2ab',0.08,1);
+[[154,153,156,231],[194,153,196,231],[154,229,196,231],[154,153,169,155],[181,153,196,155]].forEach(h=>{
   box(Math.abs(h[2]-h[0]),1.7,Math.abs(h[3]-h[1]),'#59683d',(h[0]+h[2])/2,(h[1]+h[3])/2,0.85);
 });
-[[147,170],[163,184],[148,200],[164,212]].forEach(j=>{
+[[161,170],[177,184],[162,200],[178,212]].forEach(j=>{
   box(7,0.9,0.18,'#c65b34',j[0]+3.5,j[1],0.9);
   box(0.3,1.2,0.3,'#efe7d6',j[0],j[1],0.6);box(0.3,1.2,0.3,'#efe7d6',j[0]+7,j[1],0.6);
 });
-sprite('CARRIÈRE 40×76',161,192,4);
+sprite('CARRIÈRE',175,192,4);
 
 /* ---- marcheur rond (M) ---- */
 (function(){
@@ -266,7 +266,7 @@ let theta=-0.7,phi=0.95,radius=280;
 const views={
   iso:{theta:-0.7,phi:0.95,radius:280,t:[0,4,0]},
   top:{theta:-0.0001,phi:0.02,radius:330,t:[0,4,0]},
-  carr:{theta:-0.9,phi:0.85,radius:130,t:[21,3,52]}
+  carr:{theta:-0.9,phi:0.85,radius:130,t:[35,3,52]}
 };
 function applyCam(){
   phi=Math.max(0.02,Math.min(1.45,phi));radius=Math.max(60,Math.min(650,radius));
