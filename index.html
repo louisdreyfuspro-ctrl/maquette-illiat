@@ -2,13 +2,13 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
 <title>Domaine équestre — Illiat · Maquette 3D v13</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600&family=Spectral:wght@500&display=swap" rel="stylesheet">
 <style>
   html,body{margin:0;height:100%;overflow:hidden;background:#cdd8e6;font-family:'Barlow Condensed',system-ui,sans-serif;}
-  #app{position:fixed;inset:0;} canvas{display:block;}
+  #app{position:fixed;inset:0;touch-action:none;} canvas{display:block;touch-action:none;}
   .ui{position:fixed;pointer-events:none;color:#26241f;}
   #title{left:22px;top:18px;}
   #title h1{font-family:'Spectral',serif;font-weight:500;font-size:26px;margin:0;color:#2b2a26;}
@@ -25,6 +25,20 @@
     font-family:inherit;font-size:13px;letter-spacing:1px;text-transform:uppercase;}
   #controls{left:22px;bottom:16px;display:flex;gap:8px;}
   .btn.ghost{background:rgba(251,249,244,.9);color:#3a3831;border:1px solid #c9c2b0;}
+  #legend h2{cursor:pointer;}
+  #legend h2::after{content:' ▾';}
+  #legend.folded h2::after{content:' ▸';}
+  #legend.folded .row{display:none;}
+  @media (max-width:640px){
+    #title{left:14px;top:12px;}
+    #title h1{font-size:20px;}
+    #title p{font-size:11px;letter-spacing:1.5px;}
+    #legend{right:12px;top:12px;min-width:0;padding:10px 12px;}
+    #legend .row{font-size:12px;margin:4px 0;}
+    #controls{left:12px;right:12px;bottom:12px;gap:6px;}
+    .btn{padding:10px 10px;font-size:12px;flex:1;}
+    #hint{display:none;}
+  }
 </style>
 </head>
 <body>
@@ -44,7 +58,7 @@
   <button class="btn ghost" id="top">Vue plan</button>
   <button class="btn ghost" id="carr">Vue carrière</button>
 </div>
-<div class="ui" id="hint"><span>Glisser pour pivoter · molette pour zoomer · clic droit pour déplacer</span></div>
+<div class="ui" id="hint"><span id="hintTxt">Glisser pour pivoter · molette pour zoomer · clic droit pour déplacer</span></div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
 <script>
@@ -220,16 +234,33 @@ function applyCam(){
     target.y+radius*Math.cos(phi),target.z+radius*Math.sin(phi)*Math.cos(theta));
   camera.lookAt(target);
 }
-let drag=null,px=0,py=0;
-renderer.domElement.addEventListener('pointerdown',e=>{drag=e.button;px=e.clientX;py=e.clientY;});
-addEventListener('pointerup',()=>drag=null);
+function panCam(dx,dy){const pan=radius*0.0016;
+  const right=new THREE.Vector3(Math.cos(theta),0,-Math.sin(theta));
+  const fwd=new THREE.Vector3(Math.sin(theta),0,Math.cos(theta));
+  target.addScaledVector(right,-dx*pan);target.addScaledVector(fwd,dy*pan);}
+const pointers=new Map();let pinchDist=0;
+renderer.domElement.addEventListener('pointerdown',e=>{
+  try{renderer.domElement.setPointerCapture(e.pointerId);}catch(_){}
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,button:e.button});
+  if(pointers.size===2){const p=[...pointers.values()];pinchDist=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);}
+});
+function endPointer(e){pointers.delete(e.pointerId);pinchDist=0;}
+addEventListener('pointerup',endPointer);
+addEventListener('pointercancel',endPointer);
 addEventListener('pointermove',e=>{
-  if(drag===null)return;const dx=e.clientX-px,dy=e.clientY-py;px=e.clientX;py=e.clientY;
-  if(drag===0){theta-=dx*0.005;phi-=dy*0.005;}
-  else{const pan=radius*0.0016;
-    const right=new THREE.Vector3(Math.cos(theta),0,-Math.sin(theta));
-    const fwd=new THREE.Vector3(Math.sin(theta),0,Math.cos(theta));
-    target.addScaledVector(right,-dx*pan);target.addScaledVector(fwd,dy*pan);}
+  const prev=pointers.get(e.pointerId);if(!prev)return;
+  const dx=e.clientX-prev.x,dy=e.clientY-prev.y;
+  pointers.set(e.pointerId,{x:e.clientX,y:e.clientY,button:prev.button});
+  if(pointers.size===1){
+    if(prev.button===2)panCam(dx,dy);
+    else{theta-=dx*0.005;phi-=dy*0.005;}
+  }else if(pointers.size===2){
+    const p=[...pointers.values()];
+    const d=Math.hypot(p[0].x-p[1].x,p[0].y-p[1].y);
+    if(pinchDist>0&&d>0)radius*=pinchDist/d;
+    pinchDist=d;
+    panCam(dx/2,dy/2);
+  }
   applyCam();
 });
 renderer.domElement.addEventListener('wheel',e=>{e.preventDefault();radius*=(1+Math.sign(e.deltaY)*0.08);applyCam();},{passive:false});
@@ -243,6 +274,11 @@ document.getElementById('reset').onclick=()=>tween(views.iso);
 document.getElementById('top').onclick=()=>tween(views.top);
 document.getElementById('carr').onclick=()=>tween(views.carr);
 
+if(matchMedia('(pointer:coarse)').matches)
+  document.getElementById('hintTxt').textContent='1 doigt : pivoter · pincer : zoomer · 2 doigts : déplacer';
+const leg=document.getElementById('legend');
+leg.querySelector('h2').addEventListener('click',()=>leg.classList.toggle('folded'));
+if(matchMedia('(pointer:coarse)').matches||innerWidth<=640)leg.classList.add('folded');
 function resize(){camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);}
 addEventListener('resize',resize);resize();applyCam();
 (function loop(){requestAnimationFrame(loop);renderer.render(scene,camera);})();
