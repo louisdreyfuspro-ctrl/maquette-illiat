@@ -52,7 +52,7 @@
   <div class="row"><span class="sw" style="background:#bcc98f"></span>Paddocks 2×5</div>
   <div class="row"><span class="sw" style="background:#b8a68a"></span>Marcheur rond</div>
   <div class="row"><span class="sw" style="background:#a8a8a8"></span>Parking poids lourd</div>
-  <div class="row"><span class="sw" style="background:#fbfaf3"></span>Chemin d'accès + portail</div>
+  <div class="row"><span class="sw" style="background:#f3ecdb"></span>Allée + portail</div>
 </div>
 <div class="ui" id="controls">
   <button class="btn ghost" id="reset">Vue d'ensemble</button>
@@ -166,11 +166,87 @@ plane(55,232,345,330,'#cfc0a2',0.03);
 
 /* ---- route au nord-est (le long des bois) + chemin d'accès -> parking ---- */
 ribbon([[345,45],[320,58],[300,70],[289,78],[276,90]],6,'#d8cfba',0.04);
-const CHEMIN=[[289,78],[266,88],[243,100],[222,112],[206,121],[197,128],[190,135]];
-ribbon(CHEMIN,9,'#b9b29c',0.09);
-ribbon(CHEMIN,7,'#fbfaf3',0.13);
-sprite("CHEMIN D'ACCÈS",240,96,5,'#4a4840');
-box(6,1.6,0.4,'#3a352c',291,79,0.8);
+/* allée : courbe lissée, gravier bordé, lices blanches, arbres d'alignement */
+const ALLEE=[[289,78],[280,82],[266,88],[243,100],[222,112],[206,121],[197,128],[190,135]];
+const alleeCurve=new THREE.CatmullRomCurve3(ALLEE.map(p=>new THREE.Vector3(p[0],0,p[1])),false,'catmullrom',0.5);
+const aPts=alleeCurve.getPoints(60).map(v=>[v.x,v.z]);
+ribbon(aPts,10,'#b3aa92',0.08);
+ribbon(aPts,8.4,'#a79d84',0.10);
+ribbon(aPts,7,'#f3ecdb',0.13);
+function offsetPts(P,o){
+  const out=[];
+  for(let i=0;i<P.length;i++){
+    const a=P[Math.max(0,i-1)],b=P[Math.min(P.length-1,i+1)];
+    const tx=b[0]-a[0],ty=b[1]-a[1],l=Math.hypot(tx,ty)||1;
+    out.push([P[i][0]-ty/l*o,P[i][1]+tx/l*o]);
+  }
+  return out;
+}
+const fenceMat=new THREE.MeshStandardMaterial({color:'#eee8d8',roughness:.8});
+function fence(P){
+  for(let i=0;i<P.length;i++){
+    const[x,z]=M2(P[i][0],P[i][1]);
+    const post=new THREE.Mesh(new THREE.BoxGeometry(0.14,1.25,0.14),fenceMat);
+    post.position.set(x,0.62,z);post.castShadow=true;scene.add(post);
+    if(i<P.length-1){
+      const[x2,z2]=M2(P[i+1][0],P[i+1][1]);
+      const dx=x2-x,dz=z2-z,len=Math.hypot(dx,dz),fa=Math.atan2(dz,dx);
+      [0.55,1.0].forEach(h=>{
+        const r=new THREE.Mesh(new THREE.BoxGeometry(len,0.08,0.08),fenceMat);
+        r.position.set((x+x2)/2,h,(z+z2)/2);r.rotation.y=-fa;r.castShadow=true;scene.add(r);
+      });
+    }
+  }
+}
+fence(offsetPts(aPts,5.2).filter((_,i)=>i%3===0).slice(2,-2));
+fence(offsetPts(aPts,-5.2).filter((_,i)=>i%3===0).slice(2,-2));
+for(let i=1;i<=7;i++){
+  const p=alleeCurve.getPointAt(i/9),t=alleeCurve.getTangentAt(i/9),l=Math.hypot(t.x,t.z)||1;
+  tree(p.x-t.z/l*8,p.z+t.x/l*8,0.55+Math.random()*0.25);
+  tree(p.x+t.z/l*8,p.z-t.x/l*8,0.55+Math.random()*0.25);
+}
+sprite('ALLÉE',240,96,5,'#4a4840');
+
+/* portail : piliers pierre, boules dorées, vantaux fer forgé entrouverts, murets */
+(function(){
+  const gate=new THREE.Group();
+  const stoneMat=new THREE.MeshStandardMaterial({color:'#ded6c2',roughness:.9});
+  const capMat=new THREE.MeshStandardMaterial({color:'#b3a88d',roughness:.85});
+  const ironMat=new THREE.MeshStandardMaterial({color:'#2b2823',roughness:.6,metalness:.4});
+  const goldMat=new THREE.MeshStandardMaterial({color:'#c9a24b',roughness:.35,metalness:.7});
+  [-4.2,4.2].forEach(px=>{
+    const p=new THREE.Mesh(new THREE.BoxGeometry(1.3,3.1,1.3),stoneMat);p.position.set(px,1.55,0);p.castShadow=true;gate.add(p);
+    const c=new THREE.Mesh(new THREE.BoxGeometry(1.7,0.28,1.7),capMat);c.position.set(px,3.24,0);c.castShadow=true;gate.add(c);
+    const f=new THREE.Mesh(new THREE.SphereGeometry(0.34,12,10),goldMat);f.position.set(px,3.7,0);f.castShadow=true;gate.add(f);
+  });
+  [-8.65,8.65].forEach(mx=>{
+    const w=new THREE.Mesh(new THREE.BoxGeometry(7.6,1.05,0.5),stoneMat);w.position.set(mx,0.52,0);w.castShadow=true;w.receiveShadow=true;gate.add(w);
+    const cp=new THREE.Mesh(new THREE.BoxGeometry(7.8,0.14,0.66),capMat);cp.position.set(mx,1.12,0);gate.add(cp);
+  });
+  [-12.7,12.7].forEach(px=>{
+    const p=new THREE.Mesh(new THREE.BoxGeometry(0.95,1.7,0.95),stoneMat);p.position.set(px,0.85,0);p.castShadow=true;gate.add(p);
+    const c=new THREE.Mesh(new THREE.BoxGeometry(1.2,0.2,1.2),capMat);c.position.set(px,1.78,0);gate.add(c);
+  });
+  [-1,1].forEach(s=>{
+    const leaf=new THREE.Group();
+    for(let b=0;b<=7;b++){
+      const lx=0.25+b*0.44,hb=1.9+0.5*(lx/3.3);
+      const bar=new THREE.Mesh(new THREE.BoxGeometry(0.07,hb,0.07),ironMat);
+      bar.position.set(-s*lx,hb/2,0);bar.castShadow=true;leaf.add(bar);
+      if(b%2===0){const tip=new THREE.Mesh(new THREE.SphereGeometry(0.08,8,6),goldMat);tip.position.set(-s*lx,hb+0.05,0);leaf.add(tip);}
+    }
+    [0.35,1.35].forEach(h=>{const r=new THREE.Mesh(new THREE.BoxGeometry(3.4,0.09,0.06),ironMat);r.position.set(-s*1.75,h,0);r.castShadow=true;leaf.add(r);});
+    leaf.position.set(s*3.55,0,0);leaf.rotation.y=s*0.55;
+    gate.add(leaf);
+  });
+  const apron=new THREE.Mesh(new THREE.CircleGeometry(9,28),
+    new THREE.MeshStandardMaterial({color:'#e8dfc8',roughness:1}));
+  apron.rotation.x=-Math.PI/2;apron.position.y=0.12;apron.receiveShadow=true;gate.add(apron);
+  const gd=Math.atan2(82-78,280-289);
+  const[gx,gz]=M2(289,78);
+  gate.position.set(gx,0,gz);gate.rotation.y=-(gd+Math.PI/2);
+  scene.add(gate);
+})();
 sprite('PORTAIL',296,70,5,'#4a4840');
 
 /* ---- piste au sud (existante) ---- */
@@ -255,8 +331,7 @@ box(8,2.8,6,'#7d7668',94,218,1.4);
 
 /* ---- arbres : grand bois au nord + lisière nord-est ---- */
 for(let i=0;i<26;i++){tree(105+Math.random()*100,6+Math.random()*52,0.8+Math.random()*0.6);}
-for(let i=0;i<14;i++){const t=i/13;tree(205+95*t+(Math.random()*8-4),56+38*t+(Math.random()*8-4),0.75+Math.random()*0.4);}
-[[255,94],[232,108],[214,118]].forEach(p=>tree(p[0],p[1],0.6));
+for(let i=0;i<12;i++){const t=i/13;tree(205+95*t+(Math.random()*8-4),56+38*t+(Math.random()*8-4),0.75+Math.random()*0.4);}
 [[20,255],[150,233],[300,236],[50,100],[8,120],[310,140],[300,190]].forEach(p=>tree(p[0],p[1],0.7+Math.random()*0.3));
 
 /* ---- caméra ---- */
